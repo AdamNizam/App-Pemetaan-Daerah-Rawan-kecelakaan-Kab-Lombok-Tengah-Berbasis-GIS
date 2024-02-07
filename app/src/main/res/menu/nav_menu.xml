@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+        <item
+            android:id="@+id/peta"
+            android:title="Peta"
+            android:icon="@drawable/add_location"/>
+        <item
+            android:id="@+id/rute"
+            android:title="Rute"
+            android:icon="@drawable/rute"/>
+        <item
+            android:id="@+id/notifikasi"
+            android:title="Notifikasi"
+            android:icon="@drawable/notification"/>
+        <item
+            android:id="@+id/tambahDataKecelakaan"
+            android:title="Tambah Data"
+            android:icon="@drawable/add"/>
+        <item
+            android:id="@+id/logout"
+            android:title="Keluar"
+            android:icon="@drawable/logout"
+            />
+</menu>

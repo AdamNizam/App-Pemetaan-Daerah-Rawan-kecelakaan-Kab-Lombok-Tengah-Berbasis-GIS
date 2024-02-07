@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "749339511302",
+    "firebase_url": "https://dbkecelakaan-default-rtdb.firebaseio.com",
+    "project_id": "dbkecelakaan",
+    "storage_bucket": "dbkecelakaan.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:749339511302:android:45e41eac2d71e48ef2d187",
+        "android_client_info": {
+          "package_name": "com.example.map_gis"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "749339511302-j3lavvqfg0sd2q6q8spejnbd5aueov9k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.map_gis",
+            "certificate_hash": "941dbd1b20986a4c1108ab1ca08a8730c7f9c348"
+          }
+        },
+        {
+          "client_id": "749339511302-70t6dal9j7g9707l6dcs11i93ro5c60e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDN78X5xivHqhyTpwf0VX66vIdS2FCzo4I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "749339511302-70t6dal9j7g9707l6dcs11i93ro5c60e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
