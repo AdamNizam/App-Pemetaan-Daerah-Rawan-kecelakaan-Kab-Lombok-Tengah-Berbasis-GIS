@@ -1,16 +1,17 @@
 package com.example.map_gis
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.location.Location
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.os.Looper
 import android.util.Log
-import android.view.Gravity
-import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
@@ -19,6 +20,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -39,10 +41,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.Polygon
-import com.google.android.gms.maps.model.Polyline
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -60,7 +60,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
     private var currentUserLocation: LatLng? = null
+    private var currentUserMarker: Marker? = null
     private lateinit var googleSignInClient: GoogleSignInClient
+    private var previousLocation: Location? = null
+    private val MIN_DISTANCE_THRESHOLD = 10
+
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
     }
@@ -73,7 +77,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
             drawerLayout.openDrawer(GravityCompat.START)
         }
         val navView = findViewById<NavigationView>(R.id.nav_view)
-        navView.setNavigationItemSelectedListener { menuItem ->
+        navView.setNavigationItemSelectedListener {
             drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
@@ -121,21 +125,23 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
             override fun onLocationResult(locationResult: LocationResult) {
                 locationResult ?: return
                 for (location in locationResult.locations) {
-                    val currentLatLng = LatLng(location.latitude, location.longitude)
-                    currentUserLocation = currentLatLng
-                    showCurrentLocationOnMap(currentLatLng, auth.currentUser?.displayName ?: "", auth.currentUser?.photoUrl)
+                    if (isLocationSignificantlyDifferent(location)) {
+                        val currentLatLng = LatLng(location.latitude, location.longitude)
+                        currentUserLocation = currentLatLng
+                        showCurrentLocationOnMap(
+                            currentLatLng,
+                            auth.currentUser?.displayName ?: "",
+                            auth.currentUser?.photoUrl
+                        )
+                    }
                 }
             }
         }
-
     }
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
         getCurrentLocation()
-        requestLocationUpdates()
-        val LombokTengah = LatLng(-8.7131, 116.2716)
-        val defaultZoomLevel = 10f
-        val radius = 900.0
+        val defaultZoomLevel = 11f
         val database = FirebaseDatabase.getInstance()
         val ref = database.getReference("data_kecelakaan")
         ref.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -148,21 +154,54 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
                     googleMap.addMarker(MarkerOptions().position(location).title(nama))
                     val circleOptions = CircleOptions()
                         .center(location)
-                        .radius(radius)
+                        .radius(500.0)
                         .strokeColor(Color.RED)
                         .fillColor(Color.argb(70, 0, 0, 255))
                     googleMap.addCircle(circleOptions)
+                    val userLocation = currentUserLocation
+                    if (userLocation != null) {
+                        val markerLocation = Location("")
+                        markerLocation.latitude = latitude
+                        markerLocation.longitude = longitude
+                        val userLoc = Location("")
+                        userLoc.latitude = userLocation.latitude
+                        userLoc.longitude = userLocation.longitude
+                        val distance = userLoc.distanceTo(markerLocation)
+                        val radius = 500
+
+                        if (distance <= radius) {
+                            showNotification("Peringatan Kecelakaan", " Anda berada dalam radius Daerah Rawan Kecelakaan $nama.")
+                        }
+                    }
+
                 }
             }
+
             override fun onCancelled(databaseError: DatabaseError) {
             }
         })
+        val LombokTengah = LatLng(-8.7131, 116.2716)
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LombokTengah, defaultZoomLevel))
         googleMap.mapType = GoogleMap.MAP_TYPE_NORMAL
     }
+    private fun showNotification(title: String, message: String) {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val channelId = "channel_id"
+        val channelName = "Channel Name"
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT)
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val notificationBuilder = NotificationCompat.Builder(this, channelId)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setSmallIcon(R.drawable.notification)
+
+        notificationManager.notify(0, notificationBuilder.build())
+    }
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
         when (requestCode) {
             LOCATION_PERMISSION_REQUEST_CODE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -192,6 +231,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
                     Log.e("Location", "Last known location is null.")
                     showLocationUnavailableDialog(this)
                 }
+                startLocationUpdates()
             }
         } else {
             ActivityCompat.requestPermissions(
@@ -202,16 +242,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
             Log.e("Location", "Location permission not granted.")
         }
     }
-    private fun requestLocationUpdates() {
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+    private fun startLocationUpdates() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
         } else {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
                 LOCATION_PERMISSION_REQUEST_CODE
             )
-            Log.e("Location", "Location permission not granted.")
         }
     }
     private fun showLocationUnavailableDialog(context: Context) {
@@ -227,11 +270,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
     }
     private fun showCurrentLocationOnMap(location: LatLng, username: String, photoUrl: Uri?) {
         val markerTitle = "Hello $username"
+        currentUserMarker?.remove()
         val markerOptions = MarkerOptions()
             .position(location)
             .title(markerTitle)
             .icon(getMarkerIconFromURL(photoUrl))
-        googleMap.addMarker(markerOptions)
+        currentUserMarker = googleMap.addMarker(markerOptions)
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 10f))
         currentUserLocation = location
     }
@@ -274,6 +318,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -281,6 +326,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
         } else {
             super.onBackPressed()
         }
+    }
+    private fun isLocationSignificantlyDifferent(location: Location): Boolean {
+        if (previousLocation == null) {
+            previousLocation = location
+            return true
+        }
+        val distance = location.distanceTo(previousLocation!!)
+        if (distance > MIN_DISTANCE_THRESHOLD) {
+            previousLocation = location
+            return true
+        }
+        return false
     }
     private fun signOut() {
         googleSignInClient.signOut()
@@ -291,5 +348,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
             }
     }
 
+    //end
 }
 

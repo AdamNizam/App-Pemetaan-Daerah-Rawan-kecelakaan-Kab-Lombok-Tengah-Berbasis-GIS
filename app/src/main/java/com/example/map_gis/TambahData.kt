@@ -41,6 +41,8 @@ class TambahData : AppCompatActivity() {
                 val newRef = ref.push()
                 newRef.setValue(kcl)
                 Toast.makeText(this, "Data berhasil disimpan", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
             }catch (e: Exception) {
                 Log.e("kesalahan", "Terjadi kesalahan: ${e.message}", e)
                 Toast.makeText(this, "Terjadi kesalahan: ${e.message}", Toast.LENGTH_SHORT).show()
