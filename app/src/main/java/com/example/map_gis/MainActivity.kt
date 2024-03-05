@@ -1,13 +1,16 @@
 package com.example.map_gis
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
+import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -185,6 +188,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
         googleMap.mapType = GoogleMap.MAP_TYPE_NORMAL
     }
     private fun showNotification(title: String, message: String) {
+        FirebaseDatabase.getInstance("https://dbkecelakaan-default-rtdb.firebaseio.com")
+        val notificationRef = FirebaseDatabase.getInstance().getReference("notifications")
+        val notificationId = notificationRef.push().key
+        val notification = DataNotification(title, message)
+        if (notificationId != null) {
+            notificationRef.child(notificationId).setValue(notification)
+                .addOnSuccessListener {
+                    Log.d(TAG, "Notification saved successfully")
+                }
+                .addOnFailureListener {
+                    Log.e(TAG, "Failed to save notification", it)
+                }
+        }
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val channelId = "channel_id"
         val channelName = "Channel Name"
@@ -192,11 +208,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
             val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT)
             notificationManager.createNotificationChannel(channel)
         }
+        val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setContentTitle(title)
             .setContentText(message)
             .setSmallIcon(R.drawable.notification)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setDefaults(Notification.DEFAULT_ALL)
+            .setSound(defaultSoundUri)
 
         notificationManager.notify(0, notificationBuilder.build())
     }
@@ -264,7 +284,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
             .setPositiveButton("OK") { dialog, _ ->
                 dialog.dismiss()
             }
-
         val dialog = builder.create()
         dialog.show()
     }
@@ -308,7 +327,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
                 startActivity(intent)
             }
             R.id.notifikasi -> {
-                Toast.makeText(this, "Successfully", Toast.LENGTH_LONG).show()
+                val intent = Intent(this, NotificationActivity::class.java)
+                startActivity(intent)
             }
             R.id.logout -> {
                 signOut()

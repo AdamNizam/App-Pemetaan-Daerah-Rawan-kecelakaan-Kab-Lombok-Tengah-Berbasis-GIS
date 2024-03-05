@@ -4,12 +4,14 @@ import android.app.Activity
 import android.app.Dialog
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.util.Log.d
 import android.widget.Button
 import android.widget.Toast
@@ -22,6 +24,7 @@ import com.google.android.gms.tasks.Task
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.database.FirebaseDatabase
 
 class LoginActivity : AppCompatActivity() {
 
@@ -86,6 +89,19 @@ class LoginActivity : AppCompatActivity() {
 
     }
     fun createNotification(context: Context, title: String, message: String) {
+//        FirebaseDatabase.getInstance("https://dbkecelakaan-default-rtdb.firebaseio.com")
+//        val notificationRef = FirebaseDatabase.getInstance().getReference("notifications")
+//        val notificationId = notificationRef.push().key
+//        val notification = DataNotification(title, message)
+//        if (notificationId != null) {
+//            notificationRef.child(notificationId).setValue(notification)
+//                .addOnSuccessListener {
+//                    Log.d(ContentValues.TAG, "Notification saved successfully")
+//                }
+//                .addOnFailureListener {
+//                    Log.e(ContentValues.TAG, "Failed to save notification", it)
+//                }
+//        }
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -95,7 +111,7 @@ class LoginActivity : AppCompatActivity() {
         val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 
         val builder = NotificationCompat.Builder(context, "channel_id")
-            .setSmallIcon(R.drawable.notification1)
+            .setSmallIcon(R.drawable.notification)
             .setContentTitle(title)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)

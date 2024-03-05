@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">MAp_GIS</string>
     <string name="Map_Api_key">AIzaSyDuHKEkdDBzoPZ3eAN-U_ZsaX-rwNoh-ns</string>
-<!--    <string name="Map_Api_Key2">AIzaSyCwrsmqUL86o9ZG-P0y41yIy40K6XMIYXQ</string>-->
+    <!--    <string name="Map_Api_Key2">AIzaSyCwrsmqUL86o9ZG-P0y41yIy40K6XMIYXQ</string>-->
     <string name="default_web_client_id">749339511302-70t6dal9j7g9707l6dcs11i93ro5c60e.apps.googleusercontent.com</string>
     <string name="navigation_drawer_close">Close / Tutup</string>
     <string name="navigation_drawer_open">Open / Buka</string>
