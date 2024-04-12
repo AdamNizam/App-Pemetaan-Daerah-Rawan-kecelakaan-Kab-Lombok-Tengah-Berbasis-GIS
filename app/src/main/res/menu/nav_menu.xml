@@ -5,10 +5,6 @@
             android:title="Peta"
             android:icon="@drawable/add_location"/>
         <item
-            android:id="@+id/rute"
-            android:title="Rute"
-            android:icon="@drawable/rute"/>
-        <item
             android:id="@+id/notifikasi"
             android:title="Notifikasi"
             android:icon="@drawable/notification"/>

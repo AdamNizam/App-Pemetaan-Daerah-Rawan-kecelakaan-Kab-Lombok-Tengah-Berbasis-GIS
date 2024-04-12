@@ -30,7 +30,7 @@
                 android:layout_height="match_parent"
                 android:text="Welcome"
                 android:textStyle="bold"
-                android:textColor="@color/my_primary"
+                android:textColor="?attr/colorPrimary"
                 android:textSize="32dp"/>
             <TextView
                 android:layout_width="match_parent"

@@ -15,6 +15,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.util.Log.e
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
@@ -46,6 +47,7 @@ import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -128,6 +130,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
             override fun onLocationResult(locationResult: LocationResult) {
                 locationResult ?: return
                 for (location in locationResult.locations) {
+                    e("location", "${location.latitude} ${location.longitude}")
                     if (isLocationSignificantlyDifferent(location)) {
                         val currentLatLng = LatLng(location.latitude, location.longitude)
                         currentUserLocation = currentLatLng
@@ -161,7 +164,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
                         .strokeColor(Color.RED)
                         .fillColor(Color.argb(70, 0, 0, 255))
                     googleMap.addCircle(circleOptions)
+
                     val userLocation = currentUserLocation
+
+                    userLocation?.let {
+                        val polylineOptions = PolylineOptions()
+                            .add(userLocation, location)
+                            .width(5f)
+                            .color(Color.BLUE)
+                        googleMap.addPolyline(polylineOptions)
+                    }
+
                     if (userLocation != null) {
                         val markerLocation = Location("")
                         markerLocation.latitude = latitude
@@ -176,7 +189,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
                             showNotification("Peringatan Kecelakaan", " Anda berada dalam radius Daerah Rawan Kecelakaan $nama.")
                         }
                     }
-
                 }
             }
 

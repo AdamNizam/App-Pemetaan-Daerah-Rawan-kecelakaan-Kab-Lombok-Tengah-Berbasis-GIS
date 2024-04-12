@@ -76,5 +76,6 @@ dependencies {
     implementation("com.google.maps:google-maps-services:0.15.0")
     implementation ("com.google.maps.android:android-maps-utils:2.3.0")
     implementation ("androidx.recyclerview:recyclerview:1.3.2")
+
 }
 

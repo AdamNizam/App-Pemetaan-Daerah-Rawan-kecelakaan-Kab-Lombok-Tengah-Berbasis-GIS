@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Dialog
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -66,42 +67,31 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun manageResults(task: Task<com.google.android.gms.auth.api.signin.GoogleSignInAccount>) {
-        val account : com.google.android.gms.auth.api.signin.GoogleSignInAccount? = task.result
+        val account: com.google.android.gms.auth.api.signin.GoogleSignInAccount? = task.result
         d("ACCOUNT", account?.displayName.toString())
-        if(account != null){
-            val credential = GoogleAuthProvider.getCredential(account.idToken,null)
-            auth.signInWithCredential(credential).addOnCompleteListener{
-                if(task.isSuccessful){
+        if (account != null) {
+            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+            auth.signInWithCredential(credential).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
                     createNotification(this, "Authentification", "Anda Melakukan Aktivitas Login ")
-                    Toast.makeText(this,"Login With Google Succesfully", Toast.LENGTH_SHORT).show()
-                }
-                else {
-                    Toast.makeText(this,task.exception.toString(),Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Login With Google Succesfully", Toast.LENGTH_SHORT).show()
+
+                    // Mulai layanan setelah login berhasil
+                    val serviceIntent = Intent(this, BackgroundService::class.java)
+                    startService(serviceIntent)
+                } else {
+                    Toast.makeText(this, task.exception.toString(), Toast.LENGTH_SHORT).show()
                 }
             }
             d("CREDENTIAL", credential.toString())
+        } else {
+            Toast.makeText(this, task.exception.toString(), Toast.LENGTH_SHORT).show()
         }
-        else{
-            Toast.makeText(this,task.exception.toString(),Toast.LENGTH_SHORT).show()
-        }
-
     }
+
     fun createNotification(context: Context, title: String, message: String) {
-//        FirebaseDatabase.getInstance("https://dbkecelakaan-default-rtdb.firebaseio.com")
-//        val notificationRef = FirebaseDatabase.getInstance().getReference("notifications")
-//        val notificationId = notificationRef.push().key
-//        val notification = DataNotification(title, message)
-//        if (notificationId != null) {
-//            notificationRef.child(notificationId).setValue(notification)
-//                .addOnSuccessListener {
-//                    Log.d(ContentValues.TAG, "Notification saved successfully")
-//                }
-//                .addOnFailureListener {
-//                    Log.e(ContentValues.TAG, "Failed to save notification", it)
-//                }
-//        }
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

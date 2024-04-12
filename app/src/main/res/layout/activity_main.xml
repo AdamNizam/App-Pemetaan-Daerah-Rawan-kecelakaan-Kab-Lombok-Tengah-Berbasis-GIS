@@ -13,7 +13,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/my_primary"
+            android:background="?attr/colorPrimary"
             android:elevation="5dp"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
             <ImageView
