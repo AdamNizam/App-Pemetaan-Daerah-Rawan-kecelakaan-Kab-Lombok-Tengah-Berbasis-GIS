@@ -77,10 +77,6 @@ class LoginActivity : AppCompatActivity() {
                     startActivity(intent)
                     createNotification(this, "Authentification", "Anda Melakukan Aktivitas Login ")
                     Toast.makeText(this, "Login With Google Succesfully", Toast.LENGTH_SHORT).show()
-
-                    // Mulai layanan setelah login berhasil
-                    val serviceIntent = Intent(this, BackgroundService::class.java)
-                    startService(serviceIntent)
                 } else {
                     Toast.makeText(this, task.exception.toString(), Toast.LENGTH_SHORT).show()
                 }

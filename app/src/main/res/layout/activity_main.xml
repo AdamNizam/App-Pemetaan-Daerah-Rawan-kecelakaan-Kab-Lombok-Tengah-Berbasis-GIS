@@ -12,8 +12,8 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:layout_height="50dp"
+            android:background="@color/white"
             android:elevation="5dp"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
             <ImageView
@@ -22,14 +22,14 @@
                 android:layout_height="35dp"
                 android:src="@drawable/menu"
                 android:layout_margin="10dp"
-                app:tint="@color/my_grey"
+                app:tint="@color/black"
                 />
             <TextView
                 android:id="@+id/toolbar_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Peta Daerah Rawan Kecelakaan"
-                android:textColor="@android:color/white"
+                android:text="Peta"
+                android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:layout_gravity="center"/>
@@ -39,7 +39,26 @@
             android:id="@+id/mapFragment"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="300dp" />
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/mapFragment"
+            android:padding="10dp">
+            <LinearLayout
+                android:id="@+id/linearLayoutContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Lokasi Kecamatan Rawan Kecelakaan"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:padding="16dp"/>
+            </LinearLayout>
+        </ScrollView>
     </RelativeLayout>
     <com.google.android.material.navigation.NavigationView
         android:layout_width="wrap_content"
@@ -48,4 +67,5 @@
         android:layout_gravity="start"
         app:headerLayout="@layout/activity_navbar"
         app:menu="@menu/nav_menu"/>
+
 </androidx.drawerlayout.widget.DrawerLayout>

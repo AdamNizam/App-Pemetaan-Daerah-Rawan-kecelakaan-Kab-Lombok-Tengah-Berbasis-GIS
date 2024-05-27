@@ -1,5 +1,6 @@
 package com.example.map_gis
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -9,6 +10,8 @@ import android.content.Intent
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.location.Address
+import android.location.Geocoder
 import android.location.Location
 import android.media.RingtoneManager
 import android.net.Uri
@@ -17,12 +20,15 @@ import android.os.Bundle
 import android.util.Log
 import android.util.Log.e
 import android.view.MenuItem
+import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
@@ -56,6 +62,8 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import java.io.IOException
+import java.util.Locale
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener{
 
@@ -90,6 +98,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
         auth = FirebaseAuth.getInstance()
         val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        loadKecamatanData()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         val currentUser = auth.currentUser
@@ -144,60 +153,106 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
             }
         }
     }
+
+    private fun loadKecamatanData() {
+        val database = FirebaseDatabase.getInstance()
+        val ref = database.getReference("kecamatan")
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
+            @SuppressLint("InflateParams", "SetTextI18n")
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val linearLayoutContainer = findViewById<LinearLayout>(R.id.linearLayoutContainer)
+                for (kecamatanSnapshot in dataSnapshot.children) {
+                    val kecamatanName = kecamatanSnapshot.key
+                    val lokasiList = ArrayList<String>()
+                    val jumlahLakaList = ArrayList<Int>()
+                    val latitudeList = ArrayList<Double>()
+                    val longitudeList = ArrayList<Double>()
+                    for(locationSnapshot in kecamatanSnapshot.children){
+                        val lokasi = locationSnapshot.child("lokasi").getValue(String::class.java) ?:"Tidak Ada Lokasi"
+                        val jumlahLaka = locationSnapshot.child("jumlah_laka").getValue(Int::class.java) ?: 0
+                        val latitudeLokasi = locationSnapshot.child("Latitude").getValue(Double::class.java)
+                        val longitudeLokasi = locationSnapshot.child("Longitude").getValue(Double::class.java)
+                        lokasiList.add(lokasi)
+                        jumlahLakaList.add(jumlahLaka)
+                        latitudeList.add(latitudeLokasi as Double)
+                        longitudeList.add(longitudeLokasi as Double)
+                    }
+                    val cardView = layoutInflater.inflate(R.layout.item_cardview, null, false) as CardView
+                    val lokasiTextView = cardView.findViewById<TextView>(R.id.lokasiTextView)
+                    lokasiTextView.text = "Kec. $kecamatanName Kabupaten Lombok Tengah Prov. NTB"
+                    linearLayoutContainer.addView(cardView)
+                    cardView.setOnClickListener {
+                        val intent = Intent(this@MainActivity, PetaActivity::class.java)
+                        intent.putExtra("kecamatanName", kecamatanName)
+                        intent.putStringArrayListExtra("lokasiList", lokasiList)
+                        intent.putIntegerArrayListExtra("jumlahLakaList", jumlahLakaList)
+                        intent.putExtra("latitudeList", latitudeList.toDoubleArray())
+                        intent.putExtra("longitudeList", longitudeList.toDoubleArray())
+                        startActivity(intent)
+                    }
+                }
+            }
+            override fun onCancelled(databaseError: DatabaseError) {
+//                Toast.makeText(this, "Data kosong", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
         getCurrentLocation()
-        val defaultZoomLevel = 11f
+        val defaultZoomLevel = 2f
         val database = FirebaseDatabase.getInstance()
-        val ref = database.getReference("data_kecelakaan")
+        val ref = database.getReference("kecamatan")
+
         ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                for (locationSnapshot in dataSnapshot.children) {
-                    val latitude = locationSnapshot.child("latitude").getValue(Double::class.java)
-                    val longitude = locationSnapshot.child("longitude").getValue(Double::class.java)
-                    val nama = locationSnapshot.child("namaJalan").getValue(String::class.java)
-                    val location = LatLng(latitude!!, longitude!!)
-                    googleMap.addMarker(MarkerOptions().position(location).title(nama))
-                    val circleOptions = CircleOptions()
-                        .center(location)
-                        .radius(500.0)
-                        .strokeColor(Color.RED)
-                        .fillColor(Color.argb(70, 0, 0, 255))
-                    googleMap.addCircle(circleOptions)
+                for (kecamatanSnapshot in dataSnapshot.children) {
+                    for (locationSnapshot in kecamatanSnapshot.children) {
+                        val latitude = locationSnapshot.child("Latitude").getValue(Double::class.java)
+                        val longitude = locationSnapshot.child("Longitude").getValue(Double::class.java)
+                        val nama = locationSnapshot.child("lokasi").getValue(String::class.java)
 
-                    val userLocation = currentUserLocation
+                        if (latitude != null && longitude != null && nama != null) {
+                            val location = LatLng(latitude, longitude)
+                            googleMap.addMarker(MarkerOptions().position(location).title(nama))
+                            val circleOptions = CircleOptions()
+                                .center(location)
+                                .radius(500.0)
+                                .strokeColor(Color.RED)
+                                .fillColor(Color.argb(70, 0, 0, 255))
+                            googleMap.addCircle(circleOptions)
 
-                    userLocation?.let {
-                        val polylineOptions = PolylineOptions()
-                            .add(userLocation, location)
-                            .width(5f)
-                            .color(Color.BLUE)
-                        googleMap.addPolyline(polylineOptions)
-                    }
+                            val userLocation = currentUserLocation
 
-                    if (userLocation != null) {
-                        val markerLocation = Location("")
-                        markerLocation.latitude = latitude
-                        markerLocation.longitude = longitude
-                        val userLoc = Location("")
-                        userLoc.latitude = userLocation.latitude
-                        userLoc.longitude = userLocation.longitude
-                        val distance = userLoc.distanceTo(markerLocation)
-                        val radius = 500
+                            if (userLocation != null) {
+                                val markerLocation = Location("")
+                                markerLocation.latitude = latitude
+                                markerLocation.longitude = longitude
+                                val userLoc = Location("")
+                                userLoc.latitude = userLocation.latitude
+                                userLoc.longitude = userLocation.longitude
+                                val distance = userLoc.distanceTo(markerLocation)
+                                val radius = 500
 
-                        if (distance <= radius) {
-                            showNotification("Peringatan Kecelakaan", " Anda berada dalam radius Daerah Rawan Kecelakaan $nama.")
+                                if (distance <= radius) {
+                                    showNotification("Peringatan Kecelakaan", "Anda berada dalam radius Daerah Rawan Kecelakaan $nama.")
+                                }
+                            }
                         }
                     }
                 }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
+                // Handle error
             }
         })
-        val LombokTengah = LatLng(-8.7131, 116.2716)
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LombokTengah, defaultZoomLevel))
-        googleMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+
+        currentUserLocation?.let {
+            val userLocation = LatLng(it.latitude, it.longitude)
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, defaultZoomLevel))
+        }
+        googleMap.mapType = GoogleMap.MAP_TYPE_HYBRID
     }
     private fun showNotification(title: String, message: String) {
         FirebaseDatabase.getInstance("https://dbkecelakaan-default-rtdb.firebaseio.com")
@@ -250,6 +305,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
                 location?.let {
                     val currentLatLng = LatLng(location.latitude, location.longitude)
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 10f))
+                    val geocoder = Geocoder(this, Locale.getDefault())
+                    try {
+                        val addresses: MutableList<Address>? = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                        if (addresses != null) {
+                            if (addresses.isNotEmpty()) {
+                                val address: Address = addresses[0]
+                                val lkuser = address.getAddressLine(0)
+                                Toast.makeText(applicationContext, "Lokasi anda $lkuser", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    } catch (e: IOException) {
+                        Toast.makeText(this, "Unable to get address for this location", Toast.LENGTH_SHORT).show()
+                    }
                     val user = auth.currentUser
                     val displayName = user?.displayName
                     val photoUrl = user?.photoUrl
@@ -334,10 +402,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
             }
-            R.id.tambahDataKecelakaan ->{
-                val intent = Intent(this, TambahData::class.java)
-                startActivity(intent)
-            }
             R.id.notifikasi -> {
                 val intent = Intent(this, NotificationActivity::class.java)
                 startActivity(intent)
@@ -379,7 +443,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
                 startActivity(intent)
             }
     }
-
     //end
 }
 

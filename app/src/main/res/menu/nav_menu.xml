@@ -9,10 +9,6 @@
             android:title="Notifikasi"
             android:icon="@drawable/notification"/>
         <item
-            android:id="@+id/tambahDataKecelakaan"
-            android:title="Tambah Data"
-            android:icon="@drawable/add"/>
-        <item
             android:id="@+id/logout"
             android:title="Keluar"
             android:icon="@drawable/logout"

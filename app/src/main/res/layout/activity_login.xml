@@ -30,13 +30,13 @@
                 android:layout_height="match_parent"
                 android:text="Welcome"
                 android:textStyle="bold"
-                android:textColor="?attr/colorPrimary"
+                android:textColor="@color/black"
                 android:textSize="32dp"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Please Login With Account Google"
-                android:textColor="@color/my_grey"/>
+                android:textColor="@color/black"/>
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLoginWithGoogle"
                 android:layout_width="match_parent"
@@ -45,8 +45,9 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:text="Login"
-                android:textColor="@android:color/white"
-                android:textSize="16sp" />
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:backgroundTint="@color/my_green"/>
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
