@@ -20,6 +20,7 @@ import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import android.Manifest
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.util.Log
 import android.widget.Toast
@@ -44,6 +45,7 @@ class PetaActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var longitudeList: DoubleArray
     private val LOCATION_PERMISSION_REQUEST_CODE = 1
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_peta)
@@ -79,13 +81,13 @@ class PetaActivity : AppCompatActivity(), OnMapReadyCallback {
 
                 val nameTextView = TextView(this).apply {
                     text = lokasiList[i]
-                    textSize = 16f
+                    textSize = 14f
                     setTypeface(null, android.graphics.Typeface.BOLD)
                 }
 
                 val lakaTextView = TextView(this).apply {
                     text = "Jumlah Laka: ${jumlahLakaList[i]}"
-                    textSize = 14f
+                    textSize = 12f
                     setTextColor(Color.RED)
                 }
 
@@ -166,7 +168,6 @@ class PetaActivity : AppCompatActivity(), OnMapReadyCallback {
             Log.e("PetaActivity", "SecurityException: ${securityException.message}")
         }
     }
-
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
