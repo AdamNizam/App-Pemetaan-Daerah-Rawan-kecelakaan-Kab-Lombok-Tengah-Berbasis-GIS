@@ -30,7 +30,8 @@ class NotificationActivity : AppCompatActivity() {
                 for (ds in dataSnapshot.children) {
                     val title = ds.child("title").getValue(String::class.java) ?: ""
                     val message = ds.child("message").getValue(String::class.java) ?: ""
-                    notifications.add(DataNotification(title, message))
+                    val timestamp = ds.child("timestamp").getValue(Long::class.java) ?: 0
+                    notifications.add(DataNotification(title, message,timestamp))
                 }
                 adapter.setNotifications(notifications)
             }

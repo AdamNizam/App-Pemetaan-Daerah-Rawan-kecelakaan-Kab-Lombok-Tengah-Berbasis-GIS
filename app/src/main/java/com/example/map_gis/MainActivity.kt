@@ -59,6 +59,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ServerValue
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -313,6 +314,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
                                 val address: Address = addresses[0]
                                 val lkuser = address.getAddressLine(0)
                                 Toast.makeText(applicationContext, "Lokasi anda $lkuser", Toast.LENGTH_SHORT).show()
+//                                saveLocationToDatabase(currentLatLng.latitude, currentLatLng.longitude, lkuser)
                             }
                         }
                     } catch (e: IOException) {
@@ -342,6 +344,25 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
             Log.e("Location", "Location permission not granted.")
         }
     }
+    private fun saveLocationToDatabase(latitude: Double, longitude: Double, address: String) {
+        val database = FirebaseDatabase.getInstance("https://dbkecelakaan-default-rtdb.firebaseio.com")
+        val locationsRef = database.getReference("user_locations")
+        val locationData = hashMapOf(
+            "latitude" to latitude,
+            "longitude" to longitude,
+            "address" to address,
+            "timestamp" to ServerValue.TIMESTAMP // Menambahkan timestamp untuk menandai waktu lokasi disimpan
+        )
+
+        locationsRef.push().setValue(locationData)
+            .addOnSuccessListener {
+                Log.d("DATABASE", "Location data saved successfully")
+            }
+            .addOnFailureListener { e ->
+                Log.e("DATABASE", "Error saving location data", e)
+            }
+    }
+
     private fun startLocationUpdates() {
         if (ContextCompat.checkSelfPermission(
                 this,

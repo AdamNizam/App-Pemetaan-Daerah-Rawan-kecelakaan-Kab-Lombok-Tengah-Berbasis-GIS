@@ -26,6 +26,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ServerValue
 
 class LoginActivity : AppCompatActivity() {
 
@@ -102,9 +103,26 @@ class LoginActivity : AppCompatActivity() {
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setSound(soundUri)
+        saveNotificationToDatabase(title, message)
         notificationManager.notify(1, builder.build())
     }
+    private fun saveNotificationToDatabase(title: String, message: String) {
 
+        val database = FirebaseDatabase.getInstance("https://dbkecelakaan-default-rtdb.firebaseio.com")
+        val notificationsRef = database.getReference("notifications")
 
+        val notificationData = hashMapOf(
+            "title" to title,
+            "message" to message,
+            "timestamp" to ServerValue.TIMESTAMP
+        )
+        notificationsRef.push().setValue(notificationData)
+            .addOnSuccessListener {
+                Log.d("DATABASE", "Notification data saved successfully")
+            }
+            .addOnFailureListener { e ->
+                Log.e("DATABASE", "Error saving notification data", e)
+            }
+    }
 
 }
