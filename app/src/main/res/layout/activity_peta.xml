@@ -13,28 +13,28 @@
         android:elevation="5dp"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-        <ImageView
-            android:id="@+id/menu"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:src="@drawable/menu"
-            android:layout_margin="10dp"
-            app:tint="@color/black"/>
-
-        <EditText
-            android:id="@+id/editTextSearch"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:hint="cari lokasi......."
-            android:textColor="@color/black"
-            android:layout_margin="5dp"
-            android:padding="12dp"
-            android:drawableEnd="@drawable/baseline_search_24"
-            android:drawablePadding="8dp"
-            android:inputType="text"
-            android:background="@drawable/line_bg"/>
+            android:layout_height="match_parent">
+
+            <AutoCompleteTextView
+                android:id="@+id/search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:hint="Cari lokas Tujuan .........."
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="5dp"
+                android:inputType="text"
+                android:padding="8dp"
+                android:background="@android:color/white"
+                android:drawablePadding="8dp"
+                android:drawableStart="@android:drawable/ic_menu_search" />
+        </RelativeLayout>
 
     </androidx.appcompat.widget.Toolbar>
+
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -59,10 +59,10 @@
                     android:src="@drawable/lokasi"
                     android:layout_marginEnd="10dp"/>
                 <TextView
-                    android:id="@+id/nama"
+                    android:id="@+id/waktujarak"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Lokasi Anda    :"
+                    android:text="Waktu tempuh :"
                     android:textSize="13sp"/>
             </LinearLayout>
             <View
@@ -79,6 +79,7 @@
                     android:src="@drawable/tujuan"
                     android:layout_marginEnd="10dp"/>
                 <TextView
+                    android:id="@+id/destinasi_tujuan"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Lokasi Tujuan :"
@@ -100,6 +101,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp">
         <androidx.cardview.widget.CardView
+            android:id="@+id/close_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:elevation="4dp"
@@ -112,6 +114,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="5dp">
+                <ImageView
+                    android:id="@+id/close_icon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="end|center_horizontal"
+                    android:src="@drawable/close"
+                    android:layout_marginEnd="10dp"/>
                 <TextView
                     android:id="@+id/namakecamatan"
                     android:layout_width="match_parent"
@@ -120,6 +129,7 @@
                     android:layout_margin="10dp"
                     android:textSize="15sp"
                     android:textStyle="bold"/>
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"

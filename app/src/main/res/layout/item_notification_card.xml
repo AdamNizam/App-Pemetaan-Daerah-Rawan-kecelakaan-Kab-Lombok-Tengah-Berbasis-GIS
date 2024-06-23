@@ -30,7 +30,7 @@
             android:layout_width="8dp"
             android:layout_height="10dp"
             android:layout_marginTop="8dp"
-            android:background="@drawable/message"
+            android:background="@drawable/location_icon"
             android:visibility="invisible"/>
         <TextView
             android:id="@+id/dateTextView"

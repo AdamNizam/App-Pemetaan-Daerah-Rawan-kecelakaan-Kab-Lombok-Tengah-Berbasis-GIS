@@ -314,7 +314,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
                                 val address: Address = addresses[0]
                                 val lkuser = address.getAddressLine(0)
                                 Toast.makeText(applicationContext, "Lokasi anda $lkuser", Toast.LENGTH_SHORT).show()
-//                                saveLocationToDatabase(currentLatLng.latitude, currentLatLng.longitude, lkuser)
+                                saveLocationToDatabase(currentLatLng.latitude, currentLatLng.longitude, lkuser)
                             }
                         }
                     } catch (e: IOException) {
@@ -351,7 +351,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
             "latitude" to latitude,
             "longitude" to longitude,
             "address" to address,
-            "timestamp" to ServerValue.TIMESTAMP // Menambahkan timestamp untuk menandai waktu lokasi disimpan
+            "timestamp" to ServerValue.TIMESTAMP
         )
 
         locationsRef.push().setValue(locationData)
@@ -428,7 +428,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
                 startActivity(intent)
             }
             R.id.logout -> {
-                signOut()
+                showLogoutConfirmationDialog()
             }
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
@@ -456,6 +456,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
         }
         return false
     }
+    private fun showLogoutConfirmationDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage("Apakah Anda Yakin Ingin Keluar?")
+            .setCancelable(false)
+            .setPositiveButton("Ya") { dialog, id ->
+                signOut()
+            }
+            .setNegativeButton("Tidak") { dialog, id ->
+                dialog.dismiss()
+            }
+        val alert: AlertDialog = builder.create()
+        alert.show()
+    }
     private fun signOut() {
         googleSignInClient.signOut()
             .addOnCompleteListener(this) {
@@ -464,6 +477,5 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, NavigationView.OnN
                 startActivity(intent)
             }
     }
-    //end
 }
 

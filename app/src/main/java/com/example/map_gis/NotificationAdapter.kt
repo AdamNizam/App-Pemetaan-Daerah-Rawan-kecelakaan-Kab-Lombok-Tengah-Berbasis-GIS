@@ -43,6 +43,7 @@ class NotificationAdapter(private var notifications: List<DataNotification>) :
     override fun getItemCount() = notifications.size
 
     fun setNotifications(notifications: List<DataNotification>) {
+        this.notifications = notifications.sortedByDescending { it.timestamp }
         this.notifications = notifications
         this.unreadNotifications = unreadNotifications
         notifyDataSetChanged()

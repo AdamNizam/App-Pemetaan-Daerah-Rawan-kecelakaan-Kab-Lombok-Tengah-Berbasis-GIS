@@ -21,12 +21,6 @@
         <activity
             android:name=".PetaActivity"
             android:exported="false" />
-        <activity
-            android:name=".UtamaActivity"
-            android:exported="true">
-        </activity>
-
-        <service android:name=".BackgroundService" />
 
         <activity
             android:name=".NotificationActivity"
@@ -50,9 +44,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".TambahData"
-            android:exported="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true" />
