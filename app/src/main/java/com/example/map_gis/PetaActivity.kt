@@ -38,7 +38,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
-import com.example.map_gis.R.string.Map_Api_key_premium
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
@@ -92,7 +91,7 @@ class PetaActivity : AppCompatActivity(), OnMapReadyCallback {
             closeCard.visibility = View.GONE
         }
         // Initialize Places API
-        Places.initialize(applicationContext, getString(R.string.Map_Api_key))
+        Places.initialize(applicationContext, getString(R.string.keyApi))
         placesClient = Places.createClient(this)
         autoCompleteTextView = findViewById(R.id.search)
         autoCompleteAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, autoCompleteResults)
@@ -329,7 +328,7 @@ class PetaActivity : AppCompatActivity(), OnMapReadyCallback {
 
     @SuppressLint("SetTextI18n")
     private fun getDirections(startLat: Double, startLng: Double, endLat: Double, endLng: Double) {
-        val apiKey = getString(R.string.Map_Api_key_premium)
+        val apiKey = getString(R.string.keyApi)
         val origin = "$startLat,$startLng"
         val destination = "$endLat,$endLng"
         val mode = "driving"

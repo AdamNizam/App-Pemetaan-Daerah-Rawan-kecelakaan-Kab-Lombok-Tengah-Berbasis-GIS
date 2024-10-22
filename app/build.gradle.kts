@@ -41,9 +41,8 @@ android {
         viewBinding = true
     }
     secrets {
-
-        propertiesFileName = "C:/Users/Administrator/Documents/MAp_GIS/gradle.properties"
-        defaultPropertiesFileName = "C:/Users/Administrator/Documents/MAp_GIS/local.properties"
+        propertiesFileName = "C:/Users/Administrator/App-Pemetaan-Daerah-Rawan-kecelakaan-Kab-Lombok-Tengah-Berbasis-GIS/gradle.properties"
+        defaultPropertiesFileName = "C:/Users/Administrator/App-Pemetaan-Daerah-Rawan-kecelakaan-Kab-Lombok-Tengah-Berbasis-GIS/local.properties"
         ignoreList.add("keyToIgnore")
         ignoreList.add("sdk.*")
     }
